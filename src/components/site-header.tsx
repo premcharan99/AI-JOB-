@@ -1,4 +1,4 @@
-import { Brain } from 'lucide-react';
+import { Brain, FileText, UserPlus, BotMessageSquare, MessageSquareQuote } from 'lucide-react';
 import Link from 'next/link';
 
 export function SiteHeader() {
@@ -11,6 +11,16 @@ export function SiteHeader() {
             Student Analyzer - By Mee
           </span>
         </Link>
+        <nav className="flex items-center space-x-2 sm:space-x-4">
+          <Link href="/#resume-analyzer" className="flex items-center text-sm font-medium text-foreground/80 hover:text-primary transition-colors px-2 py-1 rounded-md hover:bg-primary/10">
+            <MessageSquareQuote className="mr-2 h-4 w-4" />
+            Resume Analyzer
+          </Link>
+          <Link href="/#demo-resume-generator" className="flex items-center text-sm font-medium text-foreground/80 hover:text-primary transition-colors px-2 py-1 rounded-md hover:bg-primary/10">
+            <BotMessageSquare className="mr-2 h-4 w-4" />
+            Demo Resume
+          </Link>
+        </nav>
       </div>
     </header>
   );

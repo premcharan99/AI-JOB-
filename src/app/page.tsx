@@ -11,23 +11,27 @@ export default function HomePage() {
           Student Resume Toolkit
         </h1>
         <p className="mt-4 max-w-3xl text-lg text-muted-foreground">
-          Analyze your resume's fitness for a job, or generate a tailored demo resume based on a job description and your experience level.
+          Analyze your resume's fitness for a job, get AI-powered suggestions, modify your resume, or generate a tailored demo resume.
         </p>
       </div>
       
-      <ResumeAnalyzerForm />
+      <section id="resume-analyzer" className="scroll-mt-20">
+        <ResumeAnalyzerForm />
+      </section>
 
       <Separator className="my-12 md:my-16" />
 
-      <div className="flex flex-col items-center text-center mb-10">
-        <h2 className="text-3xl font-bold tracking-tight font-headline text-primary sm:text-4xl">
-          Generate a Demo Resume
-        </h2>
-        <p className="mt-3 max-w-2xl text-md text-muted-foreground">
-          Need a starting point? Provide a job description and select an experience level to create a sample resume.
-        </p>
-      </div>
-      <DemoResumeGeneratorForm />
+      <section id="demo-resume-generator" className="scroll-mt-20">
+        <div className="flex flex-col items-center text-center mb-10">
+          <h2 className="text-3xl font-bold tracking-tight font-headline text-primary sm:text-4xl">
+            Generate a Demo Resume
+          </h2>
+          <p className="mt-3 max-w-2xl text-md text-muted-foreground">
+            Need a starting point? Provide a job description and select an experience level to create a sample resume.
+          </p>
+        </div>
+        <DemoResumeGeneratorForm />
+      </section>
     </div>
   );
 }
