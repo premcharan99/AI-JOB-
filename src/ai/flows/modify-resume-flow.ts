@@ -10,7 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { type AnalyzeResumeOutput } from './analyze-resume-flow'; // Only import the type
+import type { AnalyzeResumeOutput } from './analyze-resume-flow'; // Only import the type
 
 const ModifyResumeInputSchema = z.object({
   jobDescription: z.string().describe('The job description text.'),
@@ -30,7 +30,7 @@ const KeywordAnalysisSchema = z.object({
 // Define LocalAnalyzeResumeOutputSchema locally to represent the structure of an analysis result.
 const LocalAnalyzeResumeOutputSchema = z.object({
   matchScore: z.string().describe('The calculated match score between the resume and job description (e.g., "85% Match", "Strong Match").'),
-  suggestions: z.string().describe('Actionable suggestions to improve the resume for the given job description, formatted as a bulleted list or detailed paragraph.'),
+  suggestions: z.string().describe('Actionable suggestions to improve the resume for the given job description, formatted as a bulleted list. Aim for 4-5 concise key points if suggestions are provided.'),
   keywords: KeywordAnalysisSchema,
 });
 
@@ -63,7 +63,7 @@ A. Revise the Original Resume Text. Incorporate the 'Suggestions for Improvement
 
 B. After revising the resume, analyze this NEWLY MODIFIED resume against the ORIGINAL 'Job Description'. For this new analysis (to be returned in the 'newAnalysis' object), provide:
     - A match score (e.g., "90% Match", "Excellent Match") as 'matchScore'.
-    - Actionable suggestions for any further minor improvements, if any, as 'suggestions'.
+    - Actionable suggestions for any further minor improvements, if any, as 'suggestions'. If providing suggestions, keep them concise (around 4-5 bullet points).
     - Keyword analysis (as a 'keywords' object):
         - 'jobDescriptionKeywords': Important keywords and skills extracted from the job description.
         - 'presentInResume': Keywords from the job description that are found in the MODIFIED resume.

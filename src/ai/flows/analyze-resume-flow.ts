@@ -18,8 +18,8 @@ const KeywordAnalysisSchema = z.object({
 }).describe("Detailed keyword analysis comparing the resume to the job description.");
 
 const AnalyzeResumeOutputSchema = z.object({
-  matchScore: z.string().describe('The calculated match score between the resume and job description (e.g., "85% Match", "Strong Match").'),
-  suggestions: z.string().describe('Actionable suggestions to improve the resume for the given job description, formatted as a bulleted list or detailed paragraph.'),
+  matchScore: z.string().describe('The calculated match score between the resume and job description (e.g., "85% Match", "Strong Match"). This could be a percentage or a qualitative assessment.'),
+  suggestions: z.string().describe('Actionable suggestions to improve the resume for the given job description, formatted as a bulleted list. Aim for 4-5 concise key points.'),
   keywords: KeywordAnalysisSchema,
 });
 export type AnalyzeResumeOutput = z.infer<typeof AnalyzeResumeOutputSchema>;
@@ -51,7 +51,7 @@ Resume:
 
 Please perform the following tasks:
 1.  Calculate a match score representing how well the resume aligns with the job description. Express this as a percentage (e.g., "85% Match") or a qualitative assessment (e.g., "Strong Match", "Moderate Match", "Weak Match").
-2.  Provide actionable suggestions to improve the resume to better fit this specific job description. Focus on highlighting relevant skills, tailoring experience descriptions, and incorporating keywords from the job description. Format suggestions as a clear, actionable list, preferably bulleted.
+2.  Provide actionable suggestions to improve the resume to better fit this specific job description. Focus on highlighting relevant skills, tailoring experience descriptions, and incorporating keywords from the job description. Format suggestions as a clear, actionable bulleted list. Keep the list concise, around 4-5 key points.
 3.  Perform a keyword analysis:
     a.  Extract the most important keywords and skills from the Job Description. Store this in 'jobDescriptionKeywords'.
     b.  Identify which of these keywords are present in the Resume. Store this in 'presentInResume'.
@@ -71,3 +71,4 @@ const analyzeResumeFlow = ai.defineFlow(
     return output!;
   }
 );
+
