@@ -6,7 +6,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Student Analyzer - By Mee',
-  description: 'AI-powered resume analysis to match job descriptions and provide improvement suggestions.',
+  description: 'AI-powered resume analysis and demo resume generation. Match your resume to job descriptions or create a tailored resume based on experience level.',
 };
 
 export default function RootLayout({
