@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, FileText, Edit3 } from 'lucide-react';
+import { ArrowRight, FileText, Edit3, Github } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -81,6 +81,18 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <footer className="mt-24 pt-8 border-t border-border text-center text-muted-foreground">
+        <p className="text-sm">
+          Done by Prem Charan Gudipudi
+        </p>
+        <p className="text-sm mt-2">
+          <Link href="https://github.com/premcharan99" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-primary transition-colors">
+            <Github className="h-4 w-4 mr-1.5" />
+            premcharan99
+          </Link>
+        </p>
+      </footer>
     </div>
   );
 }
