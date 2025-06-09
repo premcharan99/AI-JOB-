@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import { SiteHeader } from '@/components/site-header';
@@ -5,7 +6,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Student Analyzer - By Mee',
-  description: 'AI-powered content summarization to extract key insights quickly.',
+  description: 'AI-powered resume analysis to match job descriptions and provide improvement suggestions.',
 };
 
 export default function RootLayout({
