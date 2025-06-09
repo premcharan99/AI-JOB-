@@ -4,7 +4,7 @@ import { SiteHeader } from '@/components/site-header';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Synapse Summarizer',
+  title: 'Student Analyzer - By Mee',
   description: 'AI-powered content summarization to extract key insights quickly.',
 };
 

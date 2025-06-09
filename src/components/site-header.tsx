@@ -8,7 +8,7 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center space-x-2">
           <Brain className="h-7 w-7 text-primary" />
           <span className="text-xl font-bold sm:inline-block font-headline text-primary">
-            Synapse Summarizer
+            Student Analyzer - By Mee
           </span>
         </Link>
       </div>
