@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ClipboardCopy, AlertCircle, Briefcase, FileText, Lightbulb, Sparkles, Download, SearchCheck, SearchSlash, CheckCircle, Columns, Upload, FileUp } from 'lucide-react';
+import { Loader2, ClipboardCopy, AlertCircle, Briefcase, FileText, Lightbulb, Sparkles, Download, SearchCheck, SearchSlash, CheckCircle, Columns, Upload, FileUp, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -84,6 +84,7 @@ export function ResumeAnalyzerForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [showPdfWarning, setShowPdfWarning] = useState<boolean>(false);
 
   const [modifiedResume, setModifiedResume] = useState<string | null>(null);
   const [modifiedAnalysisResult, setModifiedAnalysisResult] = useState<AnalyzeResumeOutput | null>(null);
@@ -112,28 +113,33 @@ export function ResumeAnalyzerForm() {
     setFileError(null);
     setResumeText('');
     setResumeFileName(null);
+    setShowPdfWarning(false);
     const file = event.target.files?.[0];
 
     if (file) {
-      if (file.type === "text/plain") {
+      if (file.type === "application/pdf") {
         setResumeFileName(file.name);
+        setShowPdfWarning(true); // Show PDF warning
         const reader = new FileReader();
         reader.onload = (e) => {
           const text = e.target?.result as string;
-          setResumeText(text);
+          setResumeText(text); // This will be binary data for PDF, not actual text
         };
         reader.onerror = () => {
           setFileError("Error reading file. Please try again.");
           setResumeFileName(null);
+          setShowPdfWarning(false);
         };
-        reader.readAsText(file);
+        reader.readAsText(file); // Reading PDF as text will not extract readable content
       } else {
-        setFileError("Invalid file type. Please upload a .txt file only.");
+        setFileError("Invalid file type. Please upload a .pdf file only.");
         setResumeFileName(null);
+        setShowPdfWarning(false);
         event.target.value = ''; // Reset file input
       }
     } else {
         setFileError("No file selected. Please upload your resume.");
+        setShowPdfWarning(false);
     }
   };
 
@@ -149,26 +155,26 @@ export function ResumeAnalyzerForm() {
       setError('Please enter the job description.');
       return;
     }
-    if (!resumeText.trim() && !resumeFileName) {
-       setError('Please upload your resume file (.txt).');
-       setFileError('Please upload your resume file (.txt).');
+    if (!resumeFileName) { // Check if a file name exists (meaning a file was selected)
+       setError('Please upload your resume file (.pdf).');
+       setFileError('Please upload your resume file (.pdf).');
       return;
     }
-     if (!resumeText.trim() && resumeFileName) {
-      setError('There was an issue reading your resume file. Please try re-uploading a valid .txt file.');
+     if (!resumeText.trim() && resumeFileName) { // resumeText might be empty if file read failed or is pending
+      setError('There was an issue reading your resume file or it is empty. Please try re-uploading a valid .pdf file.');
       return;
     }
     setIsLoading(true);
     try {
       const result = await analyzeResume({
         jobDescription,
-        resumeText,
+        resumeText, // This will send garbled data if PDF was read as text
       } as AnalyzeResumeInput);
       setAnalysisResult(result);
       setActiveTab('initialAnalysis');
     } catch (e: any) {
       console.error('Resume analysis error:', e);
-      setError(e.message || 'Failed to analyze resume. Please try again.');
+      setError(e.message || 'Failed to analyze resume. The uploaded PDF might not be readable as plain text. Please try converting it to .txt or ensure PDF text extraction is implemented.');
       setActiveTab('input'); 
     } finally {
       setIsLoading(false);
@@ -184,9 +190,10 @@ export function ResumeAnalyzerForm() {
     setIsModifying(true);
 
     try {
+      // originalResumeText will be the garbled PDF data if not handled
       const result = await modifyResumeAndAnalyze({
         jobDescription,
-        originalResumeText: resumeText,
+        originalResumeText: resumeText, 
         analysisSuggestions: analysisResult.suggestions,
       } as ModifyResumeInput);
       setModifiedResume(result.modifiedResumeText);
@@ -194,7 +201,7 @@ export function ResumeAnalyzerForm() {
       setActiveTab('modifiedAnalysis');
     } catch (e: any) {
       console.error('Resume modification error:', e);
-      setModificationError(e.message || 'Failed to modify resume. Please try again.');
+      setModificationError(e.message || 'Failed to modify resume. The original resume data (from PDF) might be unprocessable.');
     } finally {
       setIsModifying(false);
     }
@@ -364,7 +371,7 @@ export function ResumeAnalyzerForm() {
                 Resume Analysis Inputs
               </CardTitle>
               <CardDescription>
-                Paste the job description and upload your resume file (.txt format only).
+                Paste the job description and upload your resume file (.pdf format only).
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
@@ -387,20 +394,20 @@ export function ResumeAnalyzerForm() {
 
                 <div>
                   <Label htmlFor="resume-file" className="block mb-2 font-medium text-foreground/80">
-                    Upload Your Resume (.txt file only)
+                    Upload Your Resume (.pdf file only)
                   </Label>
                   <div className="flex items-center space-x-3 mt-1">
                     <label htmlFor="resume-file" className="flex-grow">
                       <div className="flex items-center justify-center w-full px-4 py-3 text-sm text-primary border-2 border-dashed border-primary/50 rounded-lg cursor-pointer bg-primary/5 hover:bg-primary/10 transition-colors">
                         <FileUp className="w-5 h-5 mr-2" />
-                        <span>{resumeFileName || "Click to upload or drag & drop .txt file"}</span>
+                        <span>{resumeFileName || "Click to upload or drag & drop .pdf file"}</span>
                       </div>
                       <Input
                         id="resume-file"
                         type="file"
-                        accept=".txt"
+                        accept=".pdf" // Changed to .pdf
                         onChange={handleFileChange}
-                        className="sr-only" // Hidden, triggered by styled label
+                        className="sr-only" 
                         aria-label="Resume file input"
                         disabled={isLoading || isModifying}
                       />
@@ -408,6 +415,18 @@ export function ResumeAnalyzerForm() {
                     {resumeFileName && !fileError && <Upload className="h-5 w-5 text-green-500 shrink-0" />}
                   </div>
                   {resumeFileName && !fileError && <p className="text-xs text-muted-foreground mt-1.5">Selected: {resumeFileName}</p>}
+                  
+                  {showPdfWarning && (
+                    <Alert variant="default" className="mt-3 rounded-md shadow-sm py-2 px-3 border-yellow-400 bg-yellow-50">
+                      <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                      <AlertTitle className="text-sm font-semibold text-yellow-700">PDF Processing Warning</AlertTitle>
+                      <AlertDescription className="text-xs text-yellow-600">
+                        You've uploaded a PDF. This app attempts to read it as plain text, which may cause errors or inaccurate analysis.
+                        For best results, convert your PDF to a .txt file and upload that, or ensure PDF-to-text extraction is implemented.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
                   {fileError && (
                     <Alert variant="destructive" className="mt-2 rounded-md shadow-sm py-2 px-3">
                       <AlertCircle className="h-4 w-4" />
@@ -428,7 +447,7 @@ export function ResumeAnalyzerForm() {
                 <div className="flex justify-end pt-2">
                   <Button 
                     type="submit" 
-                    disabled={isLoading || isModifying || !jobDescription.trim() || !resumeText.trim() || !!fileError} 
+                    disabled={isLoading || isModifying || !jobDescription.trim() || !resumeFileName || !!fileError} 
                     className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg px-8 py-3 text-base font-semibold transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95 shadow-md"
                   >
                     Analyze Resume
@@ -469,4 +488,3 @@ export function ResumeAnalyzerForm() {
     </div>
   );
 }
-
