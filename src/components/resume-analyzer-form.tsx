@@ -97,12 +97,17 @@ export function ResumeAnalyzerForm() {
   const [activeTab, setActiveTab] = useState<ActiveTabType>('input');
   const [isLoadingPopupVisible, setIsLoadingPopupVisible] = useState(false);
   const [loadingPopupMessage, setLoadingPopupMessage] = useState('');
+  const [showPdfWarning, setShowPdfWarning] = useState(false);
 
   const { toast } = useToast();
 
   useEffect(() => {
     if (prefilledJobDescription) {
       setJobDescription(prefilledJobDescription);
+      // Optionally, clear resume fields if job description changes
+      // setResumeDataUri(null);
+      // setResumeFileName(null);
+      // setActiveTab('input');
     }
   }, [prefilledJobDescription]);
 
@@ -122,6 +127,7 @@ export function ResumeAnalyzerForm() {
     setFileError(null);
     setResumeDataUri(null); 
     setResumeFileName(null);
+    setShowPdfWarning(false);
     const file = event.target.files?.[0];
 
     if (file) {
@@ -131,6 +137,10 @@ export function ResumeAnalyzerForm() {
         reader.onload = (e) => {
           const dataUri = e.target?.result as string;
           setResumeDataUri(dataUri); 
+          // Since we are now attempting to process PDFs with AI, 
+          // the warning about plain text reading might be less relevant,
+          // but could be re-enabled if direct AI processing proves unreliable.
+          // setShowPdfWarning(true); 
         };
         reader.onerror = () => {
           setFileError("Error reading file. Please try again.");
@@ -157,6 +167,7 @@ export function ResumeAnalyzerForm() {
     setModifiedResume(null);
     setModifiedAnalysisResult(null);
     setModificationError(null);
+    setShowPdfWarning(false);
 
     if (!jobDescription.trim()) {
       setError('Please enter the job description.');
@@ -283,15 +294,7 @@ export function ResumeAnalyzerForm() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 items-start">
-            <div className="md:col-span-1 space-y-3 order-2 md:order-1">
-              <h3 className="text-lg font-semibold text-foreground flex items-center">
-                <Lightbulb className="mr-2 h-5 w-5 text-yellow-500" /> Improvement Suggestions
-              </h3>
-              <div className="p-4 border border-border rounded-md bg-background/5 shadow-sm max-h-96 overflow-y-auto">
-                {renderSuggestions(suggestions)}
-              </div>
-            </div>
-
+            {/* Match Score - Order 1 on mobile, Order 2 on md */}
             <div className="md:col-span-1 flex flex-col items-center justify-start text-center space-y-3 py-4 order-1 md:order-2 md:row-span-2">
               <h3 className="text-lg font-semibold text-foreground">Match Score</h3>
               <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full border-4 border-primary flex flex-col justify-center items-center text-center shadow-lg bg-card p-2">
@@ -306,7 +309,18 @@ export function ResumeAnalyzerForm() {
               </div>
               <p className="text-lg font-semibold text-primary">{qualitative}</p>
             </div>
+            
+            {/* Improvement Suggestions - Order 2 on mobile, Order 1 on md */}
+            <div className="md:col-span-1 space-y-3 order-2 md:order-1">
+              <h3 className="text-lg font-semibold text-foreground flex items-center">
+                <Lightbulb className="mr-2 h-5 w-5 text-yellow-500" /> Improvement Suggestions
+              </h3>
+              <div className="p-4 border border-border rounded-md bg-background/5 shadow-sm max-h-96 overflow-y-auto">
+                {renderSuggestions(suggestions)}
+              </div>
+            </div>
 
+            {/* Keyword Analysis - Order 3 on mobile, Order 3 on md */}
             <div className="md:col-span-1 space-y-3 order-3 md:order-3">
               <h3 className="text-lg font-semibold text-foreground flex items-center"><Columns className="mr-2 h-5 w-5 text-indigo-500" />Keyword Analysis</h3>
               <div className="space-y-4 p-4 border border-border rounded-md bg-background/5 shadow-sm">
@@ -353,12 +367,26 @@ export function ResumeAnalyzerForm() {
       )}
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ActiveTabType)} className="w-full">
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 mb-6">
-          <TabsTrigger value="input" disabled={isLoading || isModifying}>Step 1: Provide Details</TabsTrigger>
-          <TabsTrigger value="initialAnalysis" disabled={!analysisResult && !isLoading && !isModifying}>
+        <TabsList className="grid w-full grid-cols-1 gap-1.5 rounded-lg bg-muted p-1.5 sm:grid-cols-3 sm:gap-1 sm:p-1 mb-6">
+          <TabsTrigger 
+            value="input" 
+            disabled={isLoading || isModifying}
+            className="px-3 py-2.5 text-center whitespace-normal sm:whitespace-nowrap"
+          >
+            Step 1: Provide Details
+          </TabsTrigger>
+          <TabsTrigger 
+            value="initialAnalysis" 
+            disabled={!analysisResult && !isLoading && !isModifying}
+            className="px-3 py-2.5 text-center whitespace-normal sm:whitespace-nowrap"
+          >
             Step 2: Initial Analysis
           </TabsTrigger>
-          <TabsTrigger value="modifiedAnalysis" disabled={!modifiedResume && !isModifying}>
+          <TabsTrigger 
+            value="modifiedAnalysis" 
+            disabled={!modifiedResume && !isModifying}
+            className="px-3 py-2.5 text-center whitespace-normal sm:whitespace-nowrap"
+          >
             Step 3: AI-Powered Revision
           </TabsTrigger>
         </TabsList>
@@ -424,6 +452,16 @@ export function ResumeAnalyzerForm() {
                     </Alert>
                   )}
                 </div>
+
+                {showPdfWarning && (
+                  <Alert variant="default" className="mt-4 bg-yellow-50 border-yellow-300 text-yellow-700 dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-300 rounded-lg shadow">
+                    <AlertCircle className="h-5 w-5 !text-yellow-600 dark:!text-yellow-400" />
+                    <AlertTitle className="font-semibold">PDF Processing Note</AlertTitle>
+                    <AlertDescription>
+                      The AI will attempt to extract text from your PDF. For best results with complex PDFs, consider converting to a text-based format first.
+                    </AlertDescription>
+                  </Alert>
+                )}
                 
                 {error && (
                   <Alert variant="destructive" className="rounded-xl shadow-md">
@@ -477,3 +515,4 @@ export function ResumeAnalyzerForm() {
     </div>
   );
 }
+
