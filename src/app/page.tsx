@@ -98,19 +98,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mt-16 mb-16 text-center">
-        <Users className="h-12 w-12 text-primary mx-auto mb-4" />
-        <h2 className="text-3xl font-bold text-foreground mb-2">
-          Join Our Growing Community!
-        </h2>
-        <p className="text-6xl font-extrabold text-accent tracking-tight">
-          {animatedCount.toLocaleString()}
-        </p>
-        <p className="text-lg text-muted-foreground mt-1">
-          Analyses Performed & Counting
-        </p>
-      </section>
-
       <section className="grid md:grid-cols-3 gap-8">
         <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-xl overflow-hidden flex flex-col">
           <CardHeader className="bg-primary/10 p-6">
@@ -180,6 +167,19 @@ export default function HomePage() {
             <p className="text-base text-muted-foreground">Save time and get ahead with intelligent resume tailoring and job discovery.</p>
           </div>
         </div>
+      </section>
+
+      <section className="mt-20 mb-16 text-center">
+        <Users className="h-12 w-12 text-primary mx-auto mb-4" />
+        <h2 className="text-3xl font-bold text-foreground mb-2">
+          Join Our Growing Community!
+        </h2>
+        <p className="text-6xl font-extrabold text-accent tracking-tight">
+          {animatedCount.toLocaleString()}
+        </p>
+        <p className="text-lg text-muted-foreground mt-1">
+          Analyses Performed & Counting
+        </p>
       </section>
 
       <footer className="mt-24 pt-8 border-t border-border text-center text-muted-foreground">
