@@ -1,7 +1,7 @@
 
-# JOB analyser - a student fiend: AI-Powered Resume & Job Tools
+# JOB Analyzer - A Student Friend: AI-Powered Resume & Job Tools
 
-JOB analyser is a Next.js application designed to assist users in optimizing their resumes, creating tailored demo resumes, and discovering job opportunities using the power of Artificial Intelligence. It leverages Genkit and Google AI (Gemini models) to provide insightful analysis and content generation.
+JOB Analyzer is a Next.js application designed to assist users in optimizing their resumes, creating tailored demo resumes, and discovering job opportunities using the power of Artificial Intelligence. It leverages Genkit and Google AI (Gemini models) to provide insightful analysis and content generation.
 
 ## Core Features
 
@@ -27,13 +27,13 @@ JOB analyser is a Next.js application designed to assist users in optimizing the
 
 4.  **Find Job by Resume**:
     *   Upload your resume (PDF).
-    *   The AI processes your resume and *simulates* a search for suitable job roles from top MNCs and product-based companies.
+    *   The AI processes your resume and *simulates* a search for suitable job roles from a specified list of top MNCs and product-based companies (e.g., Amazon, Microsoft, Google, etc.).
     *   Displays a list of AI-generated job opportunities, including:
         *   Company Name
         *   Job Title
         *   Brief Job Description
         *   Match Percentage with your resume
-        *   Placeholder "Apply" link
+        *   Placeholder "Apply" link (these are simulated and not real application links).
     *   Option to "Modify resume based on this job," which pre-fills the AI-generated job description in the Resume Analyzer.
 
 ## Tech Stack
@@ -58,7 +58,7 @@ JOB analyser is a Next.js application designed to assist users in optimizing the
 1.  **Clone the repository**:
     ```bash
     git clone <your-repository-url>
-    cd job-analyser # Or your project's directory name
+    cd job-analyzer # Or your project's directory name
     ```
 
 2.  **Install dependencies**:
@@ -70,7 +70,11 @@ JOB analyser is a Next.js application designed to assist users in optimizing the
 
 3.  **Set up Environment Variables**:
     *   You'll need a Google AI API key to use the AI features. Generate one from [Google AI Studio](https://aistudio.google.com/).
-    *   Create a `.env` file in the root of your project by copying the `.env.example` file (if one exists) or creating a new one.
+    *   Create a `.env` file in the root of your project by copying the `.env.example` file (if one exists) or creating a new one:
+        ```
+        cp .env.example .env # If .env.example exists
+        ```
+        Or simply create a new file named `.env` in the project root.
     *   Add your API key to the `.env` file:
         ```env
         GOOGLE_API_KEY="YOUR_API_KEY_HERE"

@@ -7,9 +7,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
-import { Loader2, AlertCircle, Briefcase, FileUp, Upload, Sparkles, ExternalLink } from 'lucide-react';
+import { Loader2, AlertCircle, Briefcase, FileUp, Upload, Sparkles, ExternalLink, Building } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { findJobsByResume, type FindJobsByResumeInput, type FoundJob } from '@/ai/flows/find-jobs-by-resume-flow';
+import { Badge } from '@/components/ui/badge';
+
+const targetCompanies = [
+  "Amazon", "DBS", "Adobe", "Microsoft", "NCR", "Micron", 
+  "Flipkart", "Salesforce", "Uber", "Servicenow", "ADP"
+];
 
 export default function FindJobsPage() {
   const [resumeDataUri, setResumeDataUri] = useState<string | null>(null);
@@ -79,8 +85,6 @@ export default function FindJobsPage() {
         setError("Resume data is missing. Please upload your resume again.");
         return;
     }
-    // Navigate to resume analyzer, pre-filling job description. 
-    // User will need to re-upload resume there or we need a more complex state solution.
     router.push(`/resume-analyzer?jobDescription=${encodeURIComponent(jobDescription)}`);
   };
 
@@ -100,7 +104,7 @@ export default function FindJobsPage() {
           Find Jobs by Resume
         </h1>
         <p className="mt-4 max-w-3xl text-lg text-muted-foreground">
-          Upload your resume (PDF) and let our AI discover job opportunities from top companies that match your profile.
+          Upload your resume (PDF) and let our AI discover job opportunities that match your profile.
         </p>
       </div>
 
@@ -148,8 +152,23 @@ export default function FindJobsPage() {
               )}
             </div>
 
+            <div className="mt-6 p-4 border border-dashed border-border rounded-lg bg-card/50">
+                <h3 className="text-md font-semibold text-foreground mb-2 flex items-center">
+                    <Building className="mr-2 h-5 w-5 text-primary" />
+                    Searching from companies like:
+                </h3>
+                <div className="flex flex-wrap gap-2 mb-2">
+                    {targetCompanies.map(company => (
+                        <Badge key={company} variant="secondary" className="text-xs">{company}</Badge>
+                    ))}
+                </div>
+                <p className="text-xs text-muted-foreground">More companies coming soon...</p>
+                <p className="text-xs text-muted-foreground mt-1">Note: Job listings are AI-generated simulations based on your resume.</p>
+            </div>
+
+
             {error && (
-              <Alert variant="destructive" className="rounded-xl shadow-md">
+              <Alert variant="destructive" className="rounded-xl shadow-md mt-4">
                 <AlertCircle className="h-5 w-5" />
                 <AlertTitle className="font-semibold">Search Error</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
@@ -204,16 +223,22 @@ export default function FindJobsPage() {
                 >
                   <Sparkles className="mr-2 h-4 w-4" /> Modify Resume for this Job
                 </Button>
-                <a
-                  href={job.applyLink || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${job.applyLink && job.applyLink !== '#' ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 cursor-not-allowed'}`}
-                  aria-disabled={!job.applyLink || job.applyLink === '#'}
-                  onClick={(e) => (!job.applyLink || job.applyLink === '#') && e.preventDefault()}
+                <Button
+                  asChild
+                  variant={job.applyLink && job.applyLink !== '#' ? 'default' : 'secondary'}
+                  className={`w-full sm:w-auto ${job.applyLink && job.applyLink !== '#' ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-400 text-gray-700 cursor-not-allowed hover:bg-gray-400'}`}
+                  disabled={!job.applyLink || job.applyLink === '#'}
                 >
-                  Apply Now <ExternalLink className="ml-2 h-4 w-4" />
-                </a>
+                  <a
+                    href={job.applyLink && job.applyLink !== '#' ? job.applyLink : undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => (!job.applyLink || job.applyLink === '#') && e.preventDefault()}
+                    aria-disabled={!job.applyLink || job.applyLink === '#'}
+                  >
+                    Apply Now <ExternalLink className="ml-2 h-4 w-4" />
+                  </a>
+                </Button>
               </CardFooter>
             </Card>
           ))}

@@ -9,8 +9,8 @@ export default function HomePage() {
     <div className="container mx-auto max-w-5xl px-4 py-12 md:py-20">
       <section className="text-center mb-16">
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-primary mb-6">
-          Welcome to JOB analyser
-          <span className="block text-3xl md:text-4xl text-accent font-normal mt-2">a student fiend</span>
+          Welcome to JOB Analyzer
+          <span className="block text-3xl md:text-4xl text-accent font-normal mt-2">A Student Friend</span>
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
           Your AI-powered assistant for resume perfection, demo resume creation, and smart job discovery. Let's get you hired!
@@ -59,7 +59,7 @@ export default function HomePage() {
           </CardHeader>
           <CardContent className="p-6 flex flex-col flex-grow">
             <CardDescription className="text-base text-foreground/80 mb-6 flex-grow">
-              Upload your resume and let our AI find suitable job openings from top companies, complete with match scores and application links.
+              Upload your resume and let our AI find suitable job openings from top companies, complete with match scores.
             </CardDescription>
             <Button asChild className="w-full mt-auto bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg">
               <Link href="/find-jobs">
@@ -88,7 +88,7 @@ export default function HomePage() {
       </section>
 
       <section className="mt-20 text-center">
-        <h2 className="text-3xl font-bold text-primary mb-6">Why JOB analyser?</h2>
+        <h2 className="text-3xl font-bold text-primary mb-6">Why JOB Analyzer?</h2>
         <div className="grid md:grid-cols-3 gap-8 text-left">
           <div className="bg-card p-6 rounded-lg shadow-lg">
             <h3 className="font-semibold text-xl mb-2 text-foreground">AI-Powered Precision</h3>

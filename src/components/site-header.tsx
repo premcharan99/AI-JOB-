@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Brain, FileText, Edit3, Briefcase, Menu, X } from 'lucide-react';
+import { FileText, Edit3, Briefcase, Menu, X, Rss } from 'lucide-react'; // Removed Brain, Added Rss (placeholder for now, can change)
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useState } from 'react';
@@ -20,10 +20,9 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0 max-w-screen-xl">
         <Link href="/" className="flex items-center space-x-2">
-          <Brain className="h-7 w-7 text-primary" />
-          <span className="text-lg font-bold sm:inline-block font-headline text-primary leading-tight">
-            JOB analyser
-            <span className="block text-xs text-accent font-normal">a student fiend</span>
+          {/* <Rss className="h-7 w-7 text-primary" />  Optional: replace Brain with another generic icon or remove */}
+          <span className="text-xl font-bold sm:inline-block font-headline text-primary leading-tight">
+            JOB Analyzer
           </span>
         </Link>
 
@@ -53,10 +52,9 @@ export function SiteHeader() {
             <SheetContent side="right" className="w-[280px] p-0 bg-background">
               <SheetHeader className="p-4 border-b">
                 <SheetTitle className="flex items-center space-x-2">
-                  <Brain className="h-6 w-6 text-primary" />
-                   <span className="text-md font-bold font-headline text-primary leading-tight">
-                    JOB analyser
-                    <span className="block text-xs text-accent font-normal">a student fiend</span>
+                   {/* <Rss className="h-6 w-6 text-primary" /> Optional */}
+                   <span className="text-lg font-bold font-headline text-primary leading-tight">
+                    JOB Analyzer
                   </span>
                 </SheetTitle>
                  <SheetClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
