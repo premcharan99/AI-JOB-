@@ -104,10 +104,6 @@ export function ResumeAnalyzerForm() {
   useEffect(() => {
     if (prefilledJobDescription) {
       setJobDescription(prefilledJobDescription);
-      // Optionally, clear resume fields if job description changes
-      // setResumeDataUri(null);
-      // setResumeFileName(null);
-      // setActiveTab('input');
     }
   }, [prefilledJobDescription]);
 
@@ -137,10 +133,6 @@ export function ResumeAnalyzerForm() {
         reader.onload = (e) => {
           const dataUri = e.target?.result as string;
           setResumeDataUri(dataUri); 
-          // Since we are now attempting to process PDFs with AI, 
-          // the warning about plain text reading might be less relevant,
-          // but could be re-enabled if direct AI processing proves unreliable.
-          // setShowPdfWarning(true); 
         };
         reader.onerror = () => {
           setFileError("Error reading file. Please try again.");
@@ -367,25 +359,25 @@ export function ResumeAnalyzerForm() {
       )}
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ActiveTabType)} className="w-full">
-        <TabsList className="grid w-full grid-cols-1 gap-1.5 rounded-lg bg-muted p-1.5 sm:grid-cols-3 sm:gap-1 sm:p-1 mb-6">
+        <TabsList className="grid w-full grid-cols-3 gap-1 rounded-lg bg-muted p-1 mb-6">
           <TabsTrigger 
             value="input" 
             disabled={isLoading || isModifying}
-            className="px-3 py-2.5 text-center whitespace-normal sm:whitespace-nowrap"
+            className="px-3 py-2.5 text-center whitespace-normal"
           >
             Step 1: Provide Details
           </TabsTrigger>
           <TabsTrigger 
             value="initialAnalysis" 
             disabled={!analysisResult && !isLoading && !isModifying}
-            className="px-3 py-2.5 text-center whitespace-normal sm:whitespace-nowrap"
+            className="px-3 py-2.5 text-center whitespace-normal"
           >
             Step 2: Initial Analysis
           </TabsTrigger>
           <TabsTrigger 
             value="modifiedAnalysis" 
             disabled={!modifiedResume && !isModifying}
-            className="px-3 py-2.5 text-center whitespace-normal sm:whitespace-nowrap"
+            className="px-3 py-2.5 text-center whitespace-normal"
           >
             Step 3: AI-Powered Revision
           </TabsTrigger>
