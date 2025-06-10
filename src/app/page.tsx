@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, FileText, Edit3, Briefcase, Github, Users } from 'lucide-react';
+import { ArrowRight, FileText, Edit3, Briefcase, Github, Users, Link2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 const BASE_VISITOR_COUNT = 400;
@@ -190,6 +190,12 @@ export default function HomePage() {
           <Link href="https://github.com/premcharan99" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-primary transition-colors">
             <Github className="h-4 w-4 mr-1.5" />
             premcharan99
+          </Link>
+        </p>
+        <p className="text-sm mt-2">
+          <Link href="https://premcharan-gudipudi.vercel.app/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center hover:text-primary transition-colors">
+            <Link2 className="h-4 w-4 mr-1.5" />
+            My Portfolio
           </Link>
         </p>
       </footer>
