@@ -1,5 +1,16 @@
 
 import { ResumeAnalyzerForm } from '@/components/resume-analyzer-form';
+import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
+
+// A simple loading fallback component
+function ResumeAnalyzerLoadingFallback() {
+  return (
+    <div className="flex justify-center items-center min-h-[300px] w-full">
+      <Loader2 className="h-12 w-12 animate-spin text-primary" />
+    </div>
+  );
+}
 
 export default function ResumeAnalyzerPage() {
   return (
@@ -14,7 +25,9 @@ export default function ResumeAnalyzerPage() {
           You can also let AI modify your resume based on these suggestions.
         </p>
       </div>
-      <ResumeAnalyzerForm />
+      <Suspense fallback={<ResumeAnalyzerLoadingFallback />}>
+        <ResumeAnalyzerForm />
+      </Suspense>
     </div>
   );
 }
