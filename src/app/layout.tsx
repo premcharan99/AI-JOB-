@@ -5,8 +5,8 @@ import { SiteHeader } from '@/components/site-header';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Student Analyzer - AI Resume Tools',
-  description: 'AI-powered resume analysis, modification, and demo resume generation. Match your resume to job descriptions or create a tailored resume based on experience level.',
+  title: 'JOB analyser, a student fiend - AI Resume & Job Tools',
+  description: 'AI-powered resume analysis, modification, demo resume generation, and job finding based on your resume. Tailor your application for success.',
 };
 
 export default function RootLayout({

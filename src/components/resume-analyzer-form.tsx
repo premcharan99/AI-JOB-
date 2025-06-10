@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
+import { useSearchParams } from 'next/navigation';
 
 import { analyzeResume, type AnalyzeResumeInput, type AnalyzeResumeOutput } from '@/ai/flows/analyze-resume-flow';
 import { modifyResumeAndAnalyze, type ModifyResumeInput } from '@/ai/flows/modify-resume-flow';
@@ -76,8 +77,11 @@ const parseMatchScore = (scoreStr: string | undefined): { percentage: number | n
 
 
 export function ResumeAnalyzerForm() {
-  const [jobDescription, setJobDescription] = useState('');
-  const [resumeDataUri, setResumeDataUri] = useState<string | null>(null); // Changed from resumeText
+  const searchParams = useSearchParams();
+  const prefilledJobDescription = searchParams.get('jobDescription');
+
+  const [jobDescription, setJobDescription] = useState(prefilledJobDescription || '');
+  const [resumeDataUri, setResumeDataUri] = useState<string | null>(null);
   const [resumeFileName, setResumeFileName] = useState<string | null>(null);
   
   const [analysisResult, setAnalysisResult] = useState<AnalyzeResumeOutput | null>(null);
@@ -97,6 +101,12 @@ export function ResumeAnalyzerForm() {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (prefilledJobDescription) {
+      setJobDescription(prefilledJobDescription);
+    }
+  }, [prefilledJobDescription]);
+
+  useEffect(() => {
     if (isLoading) {
       setLoadingPopupMessage('Analyzing your resume...');
       setIsLoadingPopupVisible(true);
@@ -110,7 +120,7 @@ export function ResumeAnalyzerForm() {
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setFileError(null);
-    setResumeDataUri(null); // Changed from setResumeText
+    setResumeDataUri(null); 
     setResumeFileName(null);
     const file = event.target.files?.[0];
 
@@ -120,14 +130,14 @@ export function ResumeAnalyzerForm() {
         const reader = new FileReader();
         reader.onload = (e) => {
           const dataUri = e.target?.result as string;
-          setResumeDataUri(dataUri); // Store as data URI
+          setResumeDataUri(dataUri); 
         };
         reader.onerror = () => {
           setFileError("Error reading file. Please try again.");
           setResumeFileName(null);
           setResumeDataUri(null);
         };
-        reader.readAsDataURL(file); // Read as Data URL
+        reader.readAsDataURL(file); 
       } else {
         setFileError("Invalid file type. Please upload a .pdf file only.");
         setResumeFileName(null);
@@ -273,7 +283,6 @@ export function ResumeAnalyzerForm() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 items-start">
-            {/* Suggestions - Order 2 on mobile, 1 on md+ */}
             <div className="md:col-span-1 space-y-3 order-2 md:order-1">
               <h3 className="text-lg font-semibold text-foreground flex items-center">
                 <Lightbulb className="mr-2 h-5 w-5 text-yellow-500" /> Improvement Suggestions
@@ -283,7 +292,6 @@ export function ResumeAnalyzerForm() {
               </div>
             </div>
 
-            {/* Match Score - Order 1 on mobile, 2 on md+ */}
             <div className="md:col-span-1 flex flex-col items-center justify-start text-center space-y-3 py-4 order-1 md:order-2 md:row-span-2">
               <h3 className="text-lg font-semibold text-foreground">Match Score</h3>
               <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full border-4 border-primary flex flex-col justify-center items-center text-center shadow-lg bg-card p-2">
@@ -299,7 +307,6 @@ export function ResumeAnalyzerForm() {
               <p className="text-lg font-semibold text-primary">{qualitative}</p>
             </div>
 
-            {/* Keyword Analysis - Order 3 on mobile, 3 on md+ */}
             <div className="md:col-span-1 space-y-3 order-3 md:order-3">
               <h3 className="text-lg font-semibold text-foreground flex items-center"><Columns className="mr-2 h-5 w-5 text-indigo-500" />Keyword Analysis</h3>
               <div className="space-y-4 p-4 border border-border rounded-md bg-background/5 shadow-sm">
