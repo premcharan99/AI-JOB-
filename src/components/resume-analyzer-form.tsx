@@ -365,21 +365,21 @@ export function ResumeAnalyzerForm() {
             disabled={isLoading || isModifying}
             className="px-3 py-2.5 text-center whitespace-normal"
           >
-            Step 1: Provide Details
+            Step 1
           </TabsTrigger>
           <TabsTrigger 
             value="initialAnalysis" 
             disabled={!analysisResult && !isLoading && !isModifying}
             className="px-3 py-2.5 text-center whitespace-normal"
           >
-            Step 2: Initial Analysis
+            Step 2
           </TabsTrigger>
           <TabsTrigger 
             value="modifiedAnalysis" 
             disabled={!modifiedResume && !isModifying}
             className="px-3 py-2.5 text-center whitespace-normal"
           >
-            Step 3: AI-Powered Revision
+            Step 3
           </TabsTrigger>
         </TabsList>
 
