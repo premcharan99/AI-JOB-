@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ClipboardCopy, AlertCircle, Briefcase, FileText, Lightbulb, Sparkles, Download, SearchCheck, SearchSlash, CheckCircle, Columns, Upload, FileUp, AlertTriangle } from 'lucide-react';
+import { Loader2, ClipboardCopy, AlertCircle, Briefcase, FileText, Lightbulb, Sparkles, Download, SearchCheck, SearchSlash, CheckCircle, Columns, Upload, FileUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -77,14 +77,13 @@ const parseMatchScore = (scoreStr: string | undefined): { percentage: number | n
 
 export function ResumeAnalyzerForm() {
   const [jobDescription, setJobDescription] = useState('');
-  const [resumeText, setResumeText] = useState('');
+  const [resumeDataUri, setResumeDataUri] = useState<string | null>(null); // Changed from resumeText
   const [resumeFileName, setResumeFileName] = useState<string | null>(null);
   
   const [analysisResult, setAnalysisResult] = useState<AnalyzeResumeOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
-  const [showPdfWarning, setShowPdfWarning] = useState<boolean>(false);
 
   const [modifiedResume, setModifiedResume] = useState<string | null>(null);
   const [modifiedAnalysisResult, setModifiedAnalysisResult] = useState<AnalyzeResumeOutput | null>(null);
@@ -111,35 +110,33 @@ export function ResumeAnalyzerForm() {
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setFileError(null);
-    setResumeText('');
+    setResumeDataUri(null); // Changed from setResumeText
     setResumeFileName(null);
-    setShowPdfWarning(false);
     const file = event.target.files?.[0];
 
     if (file) {
       if (file.type === "application/pdf") {
         setResumeFileName(file.name);
-        setShowPdfWarning(true); // Show PDF warning
         const reader = new FileReader();
         reader.onload = (e) => {
-          const text = e.target?.result as string;
-          setResumeText(text); // This will be binary data for PDF, not actual text
+          const dataUri = e.target?.result as string;
+          setResumeDataUri(dataUri); // Store as data URI
         };
         reader.onerror = () => {
           setFileError("Error reading file. Please try again.");
           setResumeFileName(null);
-          setShowPdfWarning(false);
+          setResumeDataUri(null);
         };
-        reader.readAsText(file); // Reading PDF as text will not extract readable content
+        reader.readAsDataURL(file); // Read as Data URL
       } else {
         setFileError("Invalid file type. Please upload a .pdf file only.");
         setResumeFileName(null);
-        setShowPdfWarning(false);
-        event.target.value = ''; // Reset file input
+        setResumeDataUri(null);
+        event.target.value = ''; 
       }
     } else {
         setFileError("No file selected. Please upload your resume.");
-        setShowPdfWarning(false);
+        setResumeDataUri(null);
     }
   };
 
@@ -155,26 +152,23 @@ export function ResumeAnalyzerForm() {
       setError('Please enter the job description.');
       return;
     }
-    if (!resumeFileName) { // Check if a file name exists (meaning a file was selected)
+    if (!resumeFileName || !resumeDataUri) { 
        setError('Please upload your resume file (.pdf).');
-       setFileError('Please upload your resume file (.pdf).');
+       setFileError('Please upload your resume file (.pdf) and ensure it is processed.');
       return;
     }
-     if (!resumeText.trim() && resumeFileName) { // resumeText might be empty if file read failed or is pending
-      setError('There was an issue reading your resume file or it is empty. Please try re-uploading a valid .pdf file.');
-      return;
-    }
+    
     setIsLoading(true);
     try {
       const result = await analyzeResume({
         jobDescription,
-        resumeText, // This will send garbled data if PDF was read as text
+        resumeDataUri, 
       } as AnalyzeResumeInput);
       setAnalysisResult(result);
       setActiveTab('initialAnalysis');
     } catch (e: any) {
       console.error('Resume analysis error:', e);
-      setError(e.message || 'Failed to analyze resume. The uploaded PDF might not be readable as plain text. Please try converting it to .txt or ensure PDF text extraction is implemented.');
+      setError(e.message || 'Failed to analyze resume. The AI may not have been able to process the uploaded PDF. Please try a different PDF or ensure it is text-based.');
       setActiveTab('input'); 
     } finally {
       setIsLoading(false);
@@ -182,7 +176,7 @@ export function ResumeAnalyzerForm() {
   };
 
   const handleModifyResume = async () => {
-    if (!analysisResult || !jobDescription || !resumeText) return;
+    if (!analysisResult || !jobDescription || !resumeDataUri) return;
 
     setModificationError(null);
     setModifiedResume(null);
@@ -190,10 +184,9 @@ export function ResumeAnalyzerForm() {
     setIsModifying(true);
 
     try {
-      // originalResumeText will be the garbled PDF data if not handled
       const result = await modifyResumeAndAnalyze({
         jobDescription,
-        originalResumeText: resumeText, 
+        originalResumeDataUri: resumeDataUri, 
         analysisSuggestions: analysisResult.suggestions,
       } as ModifyResumeInput);
       setModifiedResume(result.modifiedResumeText);
@@ -201,7 +194,7 @@ export function ResumeAnalyzerForm() {
       setActiveTab('modifiedAnalysis');
     } catch (e: any) {
       console.error('Resume modification error:', e);
-      setModificationError(e.message || 'Failed to modify resume. The original resume data (from PDF) might be unprocessable.');
+      setModificationError(e.message || 'Failed to modify resume. The AI may not have been able to process the original PDF for modification.');
     } finally {
       setIsModifying(false);
     }
@@ -371,7 +364,7 @@ export function ResumeAnalyzerForm() {
                 Resume Analysis Inputs
               </CardTitle>
               <CardDescription>
-                Paste the job description and upload your resume file (.pdf format only).
+                Paste the job description and upload your resume (.pdf format only).
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
@@ -405,7 +398,7 @@ export function ResumeAnalyzerForm() {
                       <Input
                         id="resume-file"
                         type="file"
-                        accept=".pdf" // Changed to .pdf
+                        accept=".pdf" 
                         onChange={handleFileChange}
                         className="sr-only" 
                         aria-label="Resume file input"
@@ -416,17 +409,6 @@ export function ResumeAnalyzerForm() {
                   </div>
                   {resumeFileName && !fileError && <p className="text-xs text-muted-foreground mt-1.5">Selected: {resumeFileName}</p>}
                   
-                  {showPdfWarning && (
-                    <Alert variant="default" className="mt-3 rounded-md shadow-sm py-2 px-3 border-yellow-400 bg-yellow-50">
-                      <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                      <AlertTitle className="text-sm font-semibold text-yellow-700">PDF Processing Warning</AlertTitle>
-                      <AlertDescription className="text-xs text-yellow-600">
-                        You've uploaded a PDF. This app attempts to read it as plain text, which may cause errors or inaccurate analysis.
-                        For best results, convert your PDF to a .txt file and upload that, or ensure PDF-to-text extraction is implemented.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
                   {fileError && (
                     <Alert variant="destructive" className="mt-2 rounded-md shadow-sm py-2 px-3">
                       <AlertCircle className="h-4 w-4" />
@@ -447,7 +429,7 @@ export function ResumeAnalyzerForm() {
                 <div className="flex justify-end pt-2">
                   <Button 
                     type="submit" 
-                    disabled={isLoading || isModifying || !jobDescription.trim() || !resumeFileName || !!fileError} 
+                    disabled={isLoading || isModifying || !jobDescription.trim() || !resumeFileName || !!fileError || !resumeDataUri} 
                     className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg px-8 py-3 text-base font-semibold transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95 shadow-md"
                   >
                     Analyze Resume
@@ -464,7 +446,7 @@ export function ResumeAnalyzerForm() {
             <div className="flex justify-center mt-8">
               <Button 
                 onClick={handleModifyResume} 
-                disabled={isModifying || isLoading}
+                disabled={isModifying || isLoading || !resumeDataUri}
                 className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-6 sm:px-8 py-3 text-base font-semibold transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95 shadow-md"
               >
                 <Sparkles className="mr-2 h-5 w-5" />

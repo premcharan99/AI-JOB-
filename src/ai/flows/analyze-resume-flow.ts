@@ -27,7 +27,7 @@ export type AnalyzeResumeOutput = z.infer<typeof AnalyzeResumeOutputSchema>;
 
 const AnalyzeResumeInputSchema = z.object({
   jobDescription: z.string().describe('The job description text.'),
-  resumeText: z.string().describe('The resume text.'),
+  resumeDataUri: z.string().describe("The resume PDF file, as a data URI that must include a MIME type (application/pdf) and use Base64 encoding. Expected format: 'data:application/pdf;base64,<encoded_data>'."),
 });
 export type AnalyzeResumeInput = z.infer<typeof AnalyzeResumeInputSchema>;
 
@@ -41,15 +41,15 @@ const prompt = ai.definePrompt({
   input: {schema: AnalyzeResumeInputSchema},
   output: {schema: AnalyzeResumeOutputSchema},
   prompt: `You are an expert HR professional and resume reviewer.
-Given the following job description and resume:
+Given the following job description and resume (provided as a media file):
 
 Job Description:
 {{{jobDescription}}}
 
 Resume:
-{{{resumeText}}}
+{{media url=resumeDataUri}}
 
-Please perform the following tasks:
+Please perform the following tasks based on the text content extracted from the resume:
 1.  Calculate a match score representing how well the resume aligns with the job description. Express this as a percentage (e.g., "85% Match") or a qualitative assessment (e.g., "Strong Match", "Moderate Match", "Weak Match").
 2.  Provide actionable suggestions to improve the resume to better fit this specific job description. Focus on highlighting relevant skills, tailoring experience descriptions, and incorporating keywords from the job description. Format suggestions as a clear, actionable bulleted list. Keep the list concise, around 4-5 key points.
 3.  Perform a keyword analysis:
@@ -57,7 +57,7 @@ Please perform the following tasks:
     b.  Identify which of these keywords are present in the Resume. Store this in 'presentInResume'.
     c.  List important keywords from the Job Description that are NOT found in the Resume. Store this in 'missingFromResume'.
 
-Return ONLY the match score, suggestions, and the keyword analysis object in the specified output format.`,
+Return ONLY the match score, suggestions, and the keyword analysis object in the specified output format. If the resume media cannot be read or understood, indicate this clearly in the suggestions.`,
 });
 
 const analyzeResumeFlow = ai.defineFlow(
@@ -71,4 +71,3 @@ const analyzeResumeFlow = ai.defineFlow(
     return output!;
   }
 );
-
