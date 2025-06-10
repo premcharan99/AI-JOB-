@@ -8,11 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ClipboardCopy, AlertCircle, Briefcase, FileText, Lightbulb, Sparkles, Download, SearchCheck, SearchSlash, CheckCircle, Columns, Upload } from 'lucide-react';
+import { Loader2, ClipboardCopy, AlertCircle, Briefcase, FileText, Lightbulb, Sparkles, Download, SearchCheck, SearchSlash, CheckCircle, Columns, Upload, FileUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input'; // Added for file input
+import { Input } from '@/components/ui/input';
 
 import { analyzeResume, type AnalyzeResumeInput, type AnalyzeResumeOutput } from '@/ai/flows/analyze-resume-flow';
 import { modifyResumeAndAnalyze, type ModifyResumeInput } from '@/ai/flows/modify-resume-flow';
@@ -123,15 +123,17 @@ export function ResumeAnalyzerForm() {
           setResumeText(text);
         };
         reader.onerror = () => {
-          setFileError("Failed to read the file. Please try again.");
+          setFileError("Error reading file. Please try again.");
           setResumeFileName(null);
         };
         reader.readAsText(file);
       } else {
-        setFileError("Invalid file type. Please upload a .txt file.");
+        setFileError("Invalid file type. Please upload a .txt file only.");
         setResumeFileName(null);
         event.target.value = ''; // Reset file input
       }
+    } else {
+        setFileError("No file selected. Please upload your resume.");
     }
   };
 
@@ -147,9 +149,13 @@ export function ResumeAnalyzerForm() {
       setError('Please enter the job description.');
       return;
     }
-    if (!resumeText.trim()) {
-      setError('Please upload and ensure your resume file is read correctly.');
-      if (!resumeFileName) setFileError('Please upload your resume file (.txt).');
+    if (!resumeText.trim() && !resumeFileName) {
+       setError('Please upload your resume file (.txt).');
+       setFileError('Please upload your resume file (.txt).');
+      return;
+    }
+     if (!resumeText.trim() && resumeFileName) {
+      setError('There was an issue reading your resume file. Please try re-uploading a valid .txt file.');
       return;
     }
     setIsLoading(true);
@@ -266,8 +272,9 @@ export function ResumeAnalyzerForm() {
             </div>
           )}
 
-          <div className="grid md:grid-cols-3 gap-x-8 gap-y-6 items-start">
-            <div className="md:col-span-1 space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 items-start">
+            {/* Suggestions - Order 2 on mobile, 1 on md+ */}
+            <div className="md:col-span-1 space-y-3 order-2 md:order-1">
               <h3 className="text-lg font-semibold text-foreground flex items-center">
                 <Lightbulb className="mr-2 h-5 w-5 text-yellow-500" /> Improvement Suggestions
               </h3>
@@ -276,7 +283,8 @@ export function ResumeAnalyzerForm() {
               </div>
             </div>
 
-            <div className="md:col-span-1 flex flex-col items-center justify-start text-center space-y-3 py-4 md:order-first md:row-span-2 order-first mb-6 md:mb-0">
+            {/* Match Score - Order 1 on mobile, 2 on md+ */}
+            <div className="md:col-span-1 flex flex-col items-center justify-start text-center space-y-3 py-4 order-1 md:order-2 md:row-span-2">
               <h3 className="text-lg font-semibold text-foreground">Match Score</h3>
               <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full border-4 border-primary flex flex-col justify-center items-center text-center shadow-lg bg-card p-2">
                 {percentage !== null ? (
@@ -285,13 +293,14 @@ export function ResumeAnalyzerForm() {
                     <span className="text-xs text-muted-foreground mt-1">/ 100</span>
                   </>
                 ) : (
-                   <span className="text-lg font-bold text-primary px-2 break-all">{matchScore || "N/A"}</span>
+                   <span className="text-lg font-bold text-primary px-2 text-center break-words">{matchScore || "N/A"}</span>
                 )}
               </div>
               <p className="text-lg font-semibold text-primary">{qualitative}</p>
             </div>
 
-            <div className="md:col-span-1 space-y-3">
+            {/* Keyword Analysis - Order 3 on mobile, 3 on md+ */}
+            <div className="md:col-span-1 space-y-3 order-3 md:order-3">
               <h3 className="text-lg font-semibold text-foreground flex items-center"><Columns className="mr-2 h-5 w-5 text-indigo-500" />Keyword Analysis</h3>
               <div className="space-y-4 p-4 border border-border rounded-md bg-background/5 shadow-sm">
                 <KeywordDisplay title="From Job Description" keywords={keywords.jobDescriptionKeywords} variant="outline" icon={SearchCheck} />
@@ -328,10 +337,10 @@ export function ResumeAnalyzerForm() {
     <div className="space-y-2">
       {isLoadingPopupVisible && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 px-4">
-          <div className="bg-card p-8 rounded-lg shadow-2xl flex flex-col items-center text-center max-w-sm w-full">
-            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-            <p className="text-xl font-semibold text-foreground">{loadingPopupMessage}</p>
-            <p className="text-muted-foreground mt-1">Please wait a few moments.</p>
+          <div className="bg-card p-6 sm:p-8 rounded-lg shadow-2xl flex flex-col items-center text-center max-w-sm w-full">
+            <Loader2 className="h-10 w-10 sm:h-12 sm:w-12 animate-spin text-primary mb-4" />
+            <p className="text-lg sm:text-xl font-semibold text-foreground">{loadingPopupMessage}</p>
+            <p className="text-sm text-muted-foreground mt-1">Please wait a few moments.</p>
           </div>
         </div>
       )}
@@ -355,7 +364,7 @@ export function ResumeAnalyzerForm() {
                 Resume Analysis Inputs
               </CardTitle>
               <CardDescription>
-                Paste the job description and upload your resume file (.txt format).
+                Paste the job description and upload your resume file (.txt format only).
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
@@ -378,23 +387,29 @@ export function ResumeAnalyzerForm() {
 
                 <div>
                   <Label htmlFor="resume-file" className="block mb-2 font-medium text-foreground/80">
-                    Upload Your Resume (.txt file)
+                    Upload Your Resume (.txt file only)
                   </Label>
-                  <div className="flex items-center space-x-3">
-                    <Input
-                      id="resume-file"
-                      type="file"
-                      accept=".txt"
-                      onChange={handleFileChange}
-                      className="rounded-lg border-border focus:ring-primary focus:border-primary transition-shadow duration-200 ease-in-out shadow-sm hover:shadow-md flex-grow file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                      aria-label="Resume file input"
-                      disabled={isLoading || isModifying}
-                    />
-                    {resumeFileName && <Upload className="h-5 w-5 text-green-500" />}
+                  <div className="flex items-center space-x-3 mt-1">
+                    <label htmlFor="resume-file" className="flex-grow">
+                      <div className="flex items-center justify-center w-full px-4 py-3 text-sm text-primary border-2 border-dashed border-primary/50 rounded-lg cursor-pointer bg-primary/5 hover:bg-primary/10 transition-colors">
+                        <FileUp className="w-5 h-5 mr-2" />
+                        <span>{resumeFileName || "Click to upload or drag & drop .txt file"}</span>
+                      </div>
+                      <Input
+                        id="resume-file"
+                        type="file"
+                        accept=".txt"
+                        onChange={handleFileChange}
+                        className="sr-only" // Hidden, triggered by styled label
+                        aria-label="Resume file input"
+                        disabled={isLoading || isModifying}
+                      />
+                    </label>
+                    {resumeFileName && !fileError && <Upload className="h-5 w-5 text-green-500 shrink-0" />}
                   </div>
-                  {resumeFileName && <p className="text-sm text-muted-foreground mt-2">Selected file: {resumeFileName}</p>}
+                  {resumeFileName && !fileError && <p className="text-xs text-muted-foreground mt-1.5">Selected: {resumeFileName}</p>}
                   {fileError && (
-                    <Alert variant="destructive" className="mt-2 rounded-md shadow-sm">
+                    <Alert variant="destructive" className="mt-2 rounded-md shadow-sm py-2 px-3">
                       <AlertCircle className="h-4 w-4" />
                       <AlertTitle className="text-sm font-medium">File Error</AlertTitle>
                       <AlertDescription className="text-xs">{fileError}</AlertDescription>
@@ -410,10 +425,10 @@ export function ResumeAnalyzerForm() {
                   </Alert>
                 )}
                 
-                <div className="flex justify-end">
+                <div className="flex justify-end pt-2">
                   <Button 
                     type="submit" 
-                    disabled={isLoading || isModifying || !jobDescription.trim() || !resumeText.trim()} 
+                    disabled={isLoading || isModifying || !jobDescription.trim() || !resumeText.trim() || !!fileError} 
                     className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg px-8 py-3 text-base font-semibold transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95 shadow-md"
                   >
                     Analyze Resume
@@ -431,7 +446,7 @@ export function ResumeAnalyzerForm() {
               <Button 
                 onClick={handleModifyResume} 
                 disabled={isModifying || isLoading}
-                className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-8 py-3 text-base font-semibold transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95 shadow-md"
+                className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-6 sm:px-8 py-3 text-base font-semibold transition-transform duration-150 ease-in-out hover:scale-105 active:scale-95 shadow-md"
               >
                 <Sparkles className="mr-2 h-5 w-5" />
                 Suggest & Modify Resume with AI
@@ -454,3 +469,4 @@ export function ResumeAnalyzerForm() {
     </div>
   );
 }
+
