@@ -108,6 +108,14 @@ export default function FindJobsPage() {
         </p>
       </div>
 
+      <Alert variant="default" className="mb-8 bg-amber-50 border-amber-300 text-amber-700 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-300 rounded-lg shadow">
+        <AlertCircle className="h-5 w-5 !text-amber-600 dark:!text-amber-400" />
+        <AlertTitle className="font-semibold">Basic Testing Version</AlertTitle>
+        <AlertDescription>
+          Please note: The "Find Jobs by Resume" feature is currently a basic testing version. It simulates job matching based on your resume content and a predefined list of companies. The AI-generated job listings and details may not always be perfectly accurate or reflect real-time openings.
+        </AlertDescription>
+      </Alert>
+
       <Card className="shadow-xl rounded-xl overflow-hidden mb-8">
         <CardHeader className="bg-primary/10 p-6">
           <CardTitle className="text-2xl font-headline text-primary flex items-center">
@@ -155,7 +163,7 @@ export default function FindJobsPage() {
             <div className="mt-6 p-4 border border-dashed border-border rounded-lg bg-card/50">
                 <h3 className="text-md font-semibold text-foreground mb-2 flex items-center">
                     <Building className="mr-2 h-5 w-5 text-primary" />
-                    Searching from companies like:
+                    AI will generate roles simulating openings from companies like:
                 </h3>
                 <div className="flex flex-wrap gap-2 mb-2">
                     {targetCompanies.map(company => (
@@ -163,7 +171,6 @@ export default function FindJobsPage() {
                     ))}
                 </div>
                 <p className="text-xs text-muted-foreground">More companies coming soon...</p>
-                <p className="text-xs text-muted-foreground mt-1">Note: Job listings are AI-generated simulations based on your resume.</p>
             </div>
 
 

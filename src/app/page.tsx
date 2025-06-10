@@ -18,7 +18,7 @@ export default function HomePage() {
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg shadow-lg transition-transform hover:scale-105">
             <Link href="/resume-analyzer">
-              Analyze Your Resume <FileText className="ml-2 h-5 w-5" />
+              Resume Analyzer by Job desc <FileText className="ml-2 h-5 w-5" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 hover:text-primary rounded-lg shadow-md hover:shadow-lg transition-shadow">
@@ -28,7 +28,7 @@ export default function HomePage() {
           </Button>
            <Button asChild size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 hover:text-primary rounded-lg shadow-md hover:shadow-lg transition-shadow">
             <Link href="/demo-resume-generator">
-              Generate Demo Resume <Edit3 className="ml-2 h-5 w-5" />
+              Demo Resume Generator by Job desc <Edit3 className="ml-2 h-5 w-5" />
             </Link>
           </Button>
         </div>
@@ -38,11 +38,11 @@ export default function HomePage() {
         <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-xl overflow-hidden flex flex-col">
           <CardHeader className="bg-primary/10 p-6">
             <FileText className="h-10 w-10 text-primary mb-3" />
-            <CardTitle className="text-2xl font-headline text-primary">Resume Analyzer</CardTitle>
+            <CardTitle className="text-2xl font-headline text-primary">Resume Analyzer by Job desc</CardTitle>
           </CardHeader>
           <CardContent className="p-6 flex flex-col flex-grow">
             <CardDescription className="text-base text-foreground/80 mb-6 flex-grow">
-              Upload your resume and a job description. Get AI analysis, match scores, keyword insights, and suggestions to tailor your resume.
+              Upload your resume and a job description. Get AI analysis, match scores, and keyword insights to tailor your resume effectively.
             </CardDescription>
             <Button asChild className="w-full mt-auto bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg">
               <Link href="/resume-analyzer">
@@ -59,7 +59,7 @@ export default function HomePage() {
           </CardHeader>
           <CardContent className="p-6 flex flex-col flex-grow">
             <CardDescription className="text-base text-foreground/80 mb-6 flex-grow">
-              Upload your resume and let our AI find suitable job openings from top companies, complete with match scores.
+              Upload your resume and let our AI find suitable job openings from top companies, complete with match scores (basic testing version).
             </CardDescription>
             <Button asChild className="w-full mt-auto bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg">
               <Link href="/find-jobs">
@@ -72,7 +72,7 @@ export default function HomePage() {
         <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-xl overflow-hidden flex flex-col">
           <CardHeader className="bg-primary/10 p-6">
             <Edit3 className="h-10 w-10 text-primary mb-3" />
-            <CardTitle className="text-2xl font-headline text-primary">Demo Resume Generator</CardTitle>
+            <CardTitle className="text-2xl font-headline text-primary">Demo Resume Generator by Job desc</CardTitle>
           </CardHeader>
           <CardContent className="p-6 flex flex-col flex-grow">
             <CardDescription className="text-base text-foreground/80 mb-6 flex-grow">

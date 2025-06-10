@@ -2,15 +2,15 @@
 'use client';
 
 import Link from 'next/link';
-import { FileText, Edit3, Briefcase, Menu, X, Rss } from 'lucide-react'; // Removed Brain, Added Rss (placeholder for now, can change)
+import { FileText, Edit3, Briefcase, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useState } from 'react';
 
 const navLinks = [
-  { href: '/resume-analyzer', label: 'Resume Analyzer', icon: FileText },
+  { href: '/resume-analyzer', label: 'Resume Analyzer by Job desc', icon: FileText },
   { href: '/find-jobs', label: 'Find Job by Resume', icon: Briefcase },
-  { href: '/demo-resume-generator', label: 'Demo Resume', icon: Edit3 },
+  { href: '/demo-resume-generator', label: 'Demo Resume Generator by Job desc', icon: Edit3 },
 ];
 
 export function SiteHeader() {
@@ -18,13 +18,15 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
-      <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0 max-w-screen-xl">
-        <Link href="/" className="flex items-center space-x-2">
-          {/* <Rss className="h-7 w-7 text-primary" />  Optional: replace Brain with another generic icon or remove */}
+      <div className="container flex h-16 items-center max-w-screen-xl px-4">
+        <Link href="/" className="flex items-center space-x-2 pl-1 sm:pl-0"> {/* Added pl-1 for small mobile gap */}
           <span className="text-xl font-bold sm:inline-block font-headline text-primary leading-tight">
             JOB Analyzer
           </span>
         </Link>
+
+        {/* Spacer to push nav items to the right */}
+        <div className="flex-grow" /> 
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
@@ -40,8 +42,8 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        {/* Mobile Navigation */}
-        <div className="md:hidden flex items-center">
+        {/* Mobile Navigation Trigger */}
+        <div className="md:hidden flex items-center ml-2"> {/* ml-2 to ensure it's to the right */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-foreground/80 hover:text-primary">
@@ -52,7 +54,6 @@ export function SiteHeader() {
             <SheetContent side="right" className="w-[280px] p-0 bg-background">
               <SheetHeader className="p-4 border-b">
                 <SheetTitle className="flex items-center space-x-2">
-                   {/* <Rss className="h-6 w-6 text-primary" /> Optional */}
                    <span className="text-lg font-bold font-headline text-primary leading-tight">
                     JOB Analyzer
                   </span>

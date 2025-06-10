@@ -5,7 +5,7 @@ JOB Analyzer is a Next.js application designed to assist users in optimizing the
 
 ## Core Features
 
-1.  **Resume Analyzer**:
+1.  **Resume Analyzer by Job desc**:
     *   Upload your resume (PDF) and paste a job description.
     *   Receive an AI-powered analysis including:
         *   **Match Score**: A percentage-based score indicating how well your resume aligns with the job description, along with a qualitative assessment (e.g., "Strong Match", "Moderate Match"). Displayed in a clear, three-column layout with suggestions and keyword analysis.
@@ -13,19 +13,19 @@ JOB Analyzer is a Next.js application designed to assist users in optimizing the
         *   **Keyword Analysis**: A breakdown of important keywords from the job description, keywords found in your resume, and crucial keywords missing from your resume.
     *   Organized in a step-by-step tabbed interface for a clear user experience.
 
-2.  **AI-Powered Resume Modification**:
+2.  **AI-Powered Resume Modification (within Resume Analyzer)**:
     *   After the initial analysis, users can opt to have the AI modify their resume based on the provided suggestions and the job description.
     *   The system generates a revised resume (plain text).
     *   A new analysis (match score, suggestions, keywords) is provided for the AI-modified resume.
     *   Users can download the modified resume as a `.txt` file.
 
-3.  **Demo Resume Generator**:
+3.  **Demo Resume Generator by Job desc**:
     *   Input a job description.
     *   Select an experience level (Fresher, Intermediate, Senior).
     *   The AI generates a professional demo resume tailored to the job description and experience level.
     *   Users can copy the generated resume to their clipboard.
 
-4.  **Find Job by Resume**:
+4.  **Find Job by Resume (Basic Testing Version)**:
     *   Upload your resume (PDF).
     *   The AI processes your resume and *simulates* a search for suitable job roles from a specified list of top MNCs and product-based companies (e.g., Amazon, Microsoft, Google, etc.).
     *   Displays a list of AI-generated job opportunities, including:
@@ -35,6 +35,7 @@ JOB Analyzer is a Next.js application designed to assist users in optimizing the
         *   Match Percentage with your resume
         *   Placeholder "Apply" link (these are simulated and not real application links).
     *   Option to "Modify resume based on this job," which pre-fills the AI-generated job description in the Resume Analyzer.
+    *   *Disclaimer: This feature is a basic testing version and may produce inaccurate or imperfect results.*
 
 ## Tech Stack
 
