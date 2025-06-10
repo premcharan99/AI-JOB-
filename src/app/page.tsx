@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, FileText, Edit3, Briefcase, Github, Users, Link2 } from 'lucide-react';
+import { ArrowRight, FileText, Edit3, Briefcase, Github, Users, Link2, Mail } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 const BASE_VISITOR_COUNT = 400;
@@ -197,6 +197,12 @@ export default function HomePage() {
             <Link2 className="h-4 w-4 mr-1.5" />
             My Portfolio
           </Link>
+        </p>
+        <p className="text-sm mt-2">
+          For hiring inquiries, contact: <a href="mailto:gpremcharan999@gmail.com" className="inline-flex items-center hover:text-primary transition-colors">
+            <Mail className="h-4 w-4 mr-1.5" />
+            gpremcharan999@gmail.com
+          </a>
         </p>
       </footer>
     </div>
