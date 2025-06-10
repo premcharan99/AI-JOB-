@@ -1,10 +1,74 @@
 
+'use client';
+
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, FileText, Edit3, Briefcase, Github } from 'lucide-react';
+import { ArrowRight, FileText, Edit3, Briefcase, Github, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+const BASE_VISITOR_COUNT = 400;
+const LOCAL_STORAGE_KEY = 'jobAnalyzerVisitorCount';
 
 export default function HomePage() {
+  const [animatedCount, setAnimatedCount] = useState(BASE_VISITOR_COUNT);
+
+  useEffect(() => {
+    // This effect runs only on the client after hydration
+    const storedCountString = localStorage.getItem(LOCAL_STORAGE_KEY);
+    let previousCountForAnimation: number;
+    let newTotalCountToStore: number;
+
+    if (storedCountString) {
+      const storedCount = parseInt(storedCountString, 10);
+      previousCountForAnimation = storedCount;
+      newTotalCountToStore = storedCount + 1;
+    } else {
+      // First visit (or localStorage cleared), animate from BASE_COUNT-1 to BASE_COUNT
+      previousCountForAnimation = BASE_VISITOR_COUNT - 1;
+      newTotalCountToStore = BASE_VISITOR_COUNT;
+    }
+    
+    // Ensure the count never visually drops below the base if localStorage was manipulated
+    // or if starting fresh. Also ensures animation starts from at least BASE_VISITOR_COUNT - 1
+    previousCountForAnimation = Math.max(BASE_VISITOR_COUNT - 1, previousCountForAnimation);
+    newTotalCountToStore = Math.max(BASE_VISITOR_COUNT, newTotalCountToStore);
+
+    localStorage.setItem(LOCAL_STORAGE_KEY, newTotalCountToStore.toString());
+    
+    // Set the initial state for the animation
+    // If previousCountForAnimation is already equal or greater than newTotalCountToStore (e.g. after a quick refresh and calculation),
+    // just set to newTotalCountToStore to avoid issues.
+    setAnimatedCount(previousCountForAnimation < newTotalCountToStore ? previousCountForAnimation : newTotalCountToStore);
+
+    // Animation logic
+    if (previousCountForAnimation < newTotalCountToStore) {
+      const animationDuration = 700; // ms
+      const frameDuration = 1000 / 60; // Aim for 60 FPS
+      const totalFrames = Math.round(animationDuration / frameDuration);
+      const incrementPerFrame = (newTotalCountToStore - previousCountForAnimation) / totalFrames;
+      
+      let currentFrame = 0;
+      const animate = () => {
+        currentFrame++;
+        const currentDisplayValue = previousCountForAnimation + (incrementPerFrame * currentFrame);
+        
+        if (currentFrame >= totalFrames || currentDisplayValue >= newTotalCountToStore) {
+          setAnimatedCount(newTotalCountToStore); // Ensure it ends exactly on the target
+        } else {
+          setAnimatedCount(Math.ceil(currentDisplayValue));
+          requestAnimationFrame(animate);
+        }
+      };
+      const animationFrameId = requestAnimationFrame(animate);
+      return () => cancelAnimationFrame(animationFrameId);
+    } else {
+      // If no animation is needed
+      setAnimatedCount(newTotalCountToStore);
+    }
+
+  }, []); // Empty dependency array ensures this runs once on mount client-side
+
   return (
     <div className="container mx-auto max-w-5xl px-4 py-12 md:py-20">
       <section className="text-center mb-16">
@@ -32,6 +96,19 @@ export default function HomePage() {
             </Link>
           </Button>
         </div>
+      </section>
+
+      <section className="mt-16 mb-16 text-center">
+        <Users className="h-12 w-12 text-primary mx-auto mb-4" />
+        <h2 className="text-3xl font-bold text-foreground mb-2">
+          Join Our Growing Community!
+        </h2>
+        <p className="text-6xl font-extrabold text-accent tracking-tight">
+          {animatedCount.toLocaleString()}
+        </p>
+        <p className="text-lg text-muted-foreground mt-1">
+          Analyses Performed & Counting
+        </p>
       </section>
 
       <section className="grid md:grid-cols-3 gap-8">
