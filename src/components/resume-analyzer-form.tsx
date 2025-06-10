@@ -1,17 +1,18 @@
 
 'use client';
 
-import { useState, type FormEvent, useEffect } from 'react';
+import { useState, type FormEvent, useEffect, type ChangeEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, ClipboardCopy, AlertCircle, Briefcase, FileText, Lightbulb, Sparkles, Download, SearchCheck, SearchSlash, CheckCircle, Columns } from 'lucide-react';
+import { Loader2, ClipboardCopy, AlertCircle, Briefcase, FileText, Lightbulb, Sparkles, Download, SearchCheck, SearchSlash, CheckCircle, Columns, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input'; // Added for file input
 
 import { analyzeResume, type AnalyzeResumeInput, type AnalyzeResumeOutput } from '@/ai/flows/analyze-resume-flow';
 import { modifyResumeAndAnalyze, type ModifyResumeInput } from '@/ai/flows/modify-resume-flow';
@@ -56,7 +57,7 @@ const parseMatchScore = (scoreStr: string | undefined): { percentage: number | n
     percentage = parseInt(match[1], 10);
   }
 
-  let qualitative = scoreStr; // Default to the original string if no better qualitative assessment is found
+  let qualitative = scoreStr; 
   if (percentage !== null) {
     if (percentage >= 90) qualitative = "Insane Match";
     else if (percentage >= 75) qualitative = "Strong Match";
@@ -77,10 +78,12 @@ const parseMatchScore = (scoreStr: string | undefined): { percentage: number | n
 export function ResumeAnalyzerForm() {
   const [jobDescription, setJobDescription] = useState('');
   const [resumeText, setResumeText] = useState('');
+  const [resumeFileName, setResumeFileName] = useState<string | null>(null);
   
   const [analysisResult, setAnalysisResult] = useState<AnalyzeResumeOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   const [modifiedResume, setModifiedResume] = useState<string | null>(null);
   const [modifiedAnalysisResult, setModifiedAnalysisResult] = useState<AnalyzeResumeOutput | null>(null);
@@ -105,6 +108,33 @@ export function ResumeAnalyzerForm() {
     }
   }, [isLoading, isModifying]);
 
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setFileError(null);
+    setResumeText('');
+    setResumeFileName(null);
+    const file = event.target.files?.[0];
+
+    if (file) {
+      if (file.type === "text/plain") {
+        setResumeFileName(file.name);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const text = e.target?.result as string;
+          setResumeText(text);
+        };
+        reader.onerror = () => {
+          setFileError("Failed to read the file. Please try again.");
+          setResumeFileName(null);
+        };
+        reader.readAsText(file);
+      } else {
+        setFileError("Invalid file type. Please upload a .txt file.");
+        setResumeFileName(null);
+        event.target.value = ''; // Reset file input
+      }
+    }
+  };
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
@@ -118,7 +148,8 @@ export function ResumeAnalyzerForm() {
       return;
     }
     if (!resumeText.trim()) {
-      setError('Please enter your resume text.');
+      setError('Please upload and ensure your resume file is read correctly.');
+      if (!resumeFileName) setFileError('Please upload your resume file (.txt).');
       return;
     }
     setIsLoading(true);
@@ -132,7 +163,7 @@ export function ResumeAnalyzerForm() {
     } catch (e: any) {
       console.error('Resume analysis error:', e);
       setError(e.message || 'Failed to analyze resume. Please try again.');
-      setActiveTab('input'); // Stay on input tab if error
+      setActiveTab('input'); 
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +189,6 @@ export function ResumeAnalyzerForm() {
     } catch (e: any) {
       console.error('Resume modification error:', e);
       setModificationError(e.message || 'Failed to modify resume. Please try again.');
-      // Stay on initialAnalysis tab if error during modification
     } finally {
       setIsModifying(false);
     }
@@ -201,7 +231,6 @@ export function ResumeAnalyzerForm() {
   
   const renderSuggestions = (suggestions: string | undefined) => {
     if (!suggestions) return <p className="text-sm text-muted-foreground">No suggestions provided.</p>;
-    // Create a basic list from newline-separated suggestions, assuming AI provides bullet points or simple lines.
     const suggestionItems = suggestions.split('\n').filter(line => line.trim() !== "").map((line, index) => (
       <li key={index} className="text-sm leading-relaxed text-foreground/90 mb-1">{line.replace(/^- ?/, '• ')}</li>
     ));
@@ -238,7 +267,6 @@ export function ResumeAnalyzerForm() {
           )}
 
           <div className="grid md:grid-cols-3 gap-x-8 gap-y-6 items-start">
-            {/* Left Column: Suggestions */}
             <div className="md:col-span-1 space-y-3">
               <h3 className="text-lg font-semibold text-foreground flex items-center">
                 <Lightbulb className="mr-2 h-5 w-5 text-yellow-500" /> Improvement Suggestions
@@ -248,7 +276,6 @@ export function ResumeAnalyzerForm() {
               </div>
             </div>
 
-            {/* Center Column: Match Score */}
             <div className="md:col-span-1 flex flex-col items-center justify-start text-center space-y-3 py-4 md:order-first md:row-span-2 order-first mb-6 md:mb-0">
               <h3 className="text-lg font-semibold text-foreground">Match Score</h3>
               <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full border-4 border-primary flex flex-col justify-center items-center text-center shadow-lg bg-card p-2">
@@ -264,7 +291,6 @@ export function ResumeAnalyzerForm() {
               <p className="text-lg font-semibold text-primary">{qualitative}</p>
             </div>
 
-            {/* Right Column: Keywords */}
             <div className="md:col-span-1 space-y-3">
               <h3 className="text-lg font-semibold text-foreground flex items-center"><Columns className="mr-2 h-5 w-5 text-indigo-500" />Keyword Analysis</h3>
               <div className="space-y-4 p-4 border border-border rounded-md bg-background/5 shadow-sm">
@@ -329,7 +355,7 @@ export function ResumeAnalyzerForm() {
                 Resume Analysis Inputs
               </CardTitle>
               <CardDescription>
-                Paste the job description and your resume below. The AI will analyze them.
+                Paste the job description and upload your resume file (.txt format).
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
@@ -351,19 +377,29 @@ export function ResumeAnalyzerForm() {
                 </div>
 
                 <div>
-                  <Label htmlFor="resume-text" className="block mb-2 font-medium text-foreground/80">
-                    Your Resume
+                  <Label htmlFor="resume-file" className="block mb-2 font-medium text-foreground/80">
+                    Upload Your Resume (.txt file)
                   </Label>
-                  <Textarea
-                    id="resume-text"
-                    placeholder="Paste your full resume text here..."
-                    value={resumeText}
-                    onChange={(e) => setResumeText(e.target.value)}
-                    rows={15}
-                    className="rounded-lg border-border focus:ring-primary focus:border-primary transition-shadow duration-200 ease-in-out shadow-sm hover:shadow-md"
-                    aria-label="Resume text input"
-                    disabled={isLoading || isModifying}
-                  />
+                  <div className="flex items-center space-x-3">
+                    <Input
+                      id="resume-file"
+                      type="file"
+                      accept=".txt"
+                      onChange={handleFileChange}
+                      className="rounded-lg border-border focus:ring-primary focus:border-primary transition-shadow duration-200 ease-in-out shadow-sm hover:shadow-md flex-grow file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                      aria-label="Resume file input"
+                      disabled={isLoading || isModifying}
+                    />
+                    {resumeFileName && <Upload className="h-5 w-5 text-green-500" />}
+                  </div>
+                  {resumeFileName && <p className="text-sm text-muted-foreground mt-2">Selected file: {resumeFileName}</p>}
+                  {fileError && (
+                    <Alert variant="destructive" className="mt-2 rounded-md shadow-sm">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle className="text-sm font-medium">File Error</AlertTitle>
+                      <AlertDescription className="text-xs">{fileError}</AlertDescription>
+                    </Alert>
+                  )}
                 </div>
                 
                 {error && (
@@ -390,7 +426,7 @@ export function ResumeAnalyzerForm() {
 
         <TabsContent value="initialAnalysis">
           {analysisResult && renderAnalysisSection("Initial Analysis Results", analysisResult)}
-          {analysisResult && !modifiedResume && ( // Show modify button only if not already modified
+          {analysisResult && !modifiedResume && ( 
             <div className="flex justify-center mt-8">
               <Button 
                 onClick={handleModifyResume} 
@@ -402,7 +438,7 @@ export function ResumeAnalyzerForm() {
               </Button>
             </div>
           )}
-          {modificationError && ( // Show modification error here if it occurred
+          {modificationError && ( 
             <Alert variant="destructive" className="rounded-xl shadow-md mt-8">
               <AlertCircle className="h-5 w-5" />
               <AlertTitle className="font-semibold">Modification Error</AlertTitle>
