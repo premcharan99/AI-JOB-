@@ -14,60 +14,56 @@ export default function HomePage() {
   const [animatedCount, setAnimatedCount] = useState(BASE_VISITOR_COUNT);
 
   useEffect(() => {
-    // This effect runs only on the client after hydration
+    // This effect runs only on the client after hydration.
+    // It increments the count stored in localStorage for this specific user/browser on each visit.
     const storedCountString = localStorage.getItem(LOCAL_STORAGE_KEY);
     let previousCountForAnimation: number;
     let newTotalCountToStore: number;
 
     if (storedCountString) {
       const storedCount = parseInt(storedCountString, 10);
-      previousCountForAnimation = storedCount;
-      newTotalCountToStore = storedCount + 1;
+      previousCountForAnimation = storedCount; // The count before this current visit
+      newTotalCountToStore = storedCount + 1;  // Increment for this visit
     } else {
-      // First visit (or localStorage cleared), animate from BASE_COUNT-1 to BASE_COUNT
-      previousCountForAnimation = BASE_VISITOR_COUNT - 1;
-      newTotalCountToStore = BASE_VISITOR_COUNT;
+      // First visit for this browser, or localStorage was cleared
+      previousCountForAnimation = BASE_VISITOR_COUNT - 1; // Start animation just below base
+      newTotalCountToStore = BASE_VISITOR_COUNT;       // Set to base for this first visit
     }
     
     // Ensure the count never visually drops below the base if localStorage was manipulated
-    // or if starting fresh. Also ensures animation starts from at least BASE_VISITOR_COUNT - 1
+    // or if starting fresh. Also ensures animation starts from at least BASE_VISITOR_COUNT - 1.
     previousCountForAnimation = Math.max(BASE_VISITOR_COUNT - 1, previousCountForAnimation);
     newTotalCountToStore = Math.max(BASE_VISITOR_COUNT, newTotalCountToStore);
 
+    // Save the new, incremented count back to localStorage for this user's browser.
     localStorage.setItem(LOCAL_STORAGE_KEY, newTotalCountToStore.toString());
     
-    // Set the initial state for the animation
-    // If previousCountForAnimation is already equal or greater than newTotalCountToStore (e.g. after a quick refresh and calculation),
-    // just set to newTotalCountToStore to avoid issues.
-    setAnimatedCount(previousCountForAnimation < newTotalCountToStore ? previousCountForAnimation : newTotalCountToStore);
+    // Set the initial state for the animation to the count before this visit's increment.
+    setAnimatedCount(previousCountForAnimation);
 
-    // Animation logic
+    // Animation logic for "live scrolling" effect
     if (previousCountForAnimation < newTotalCountToStore) {
-      const animationDuration = 700; // ms
-      const frameDuration = 1000 / 60; // Aim for 60 FPS
-      const totalFrames = Math.round(animationDuration / frameDuration);
-      const incrementPerFrame = (newTotalCountToStore - previousCountForAnimation) / totalFrames;
-      
-      let currentFrame = 0;
-      const animate = () => {
-        currentFrame++;
-        const currentDisplayValue = previousCountForAnimation + (incrementPerFrame * currentFrame);
+        let currentDisplayValue = previousCountForAnimation;
+        const intervalTime = 25; // Milliseconds for each increment step (faster for "scrolling" feel)
         
-        if (currentFrame >= totalFrames || currentDisplayValue >= newTotalCountToStore) {
-          setAnimatedCount(newTotalCountToStore); // Ensure it ends exactly on the target
-        } else {
-          setAnimatedCount(Math.ceil(currentDisplayValue));
-          requestAnimationFrame(animate);
-        }
-      };
-      const animationFrameId = requestAnimationFrame(animate);
-      return () => cancelAnimationFrame(animationFrameId);
+        const animate = () => {
+            currentDisplayValue++; // Increment the display value by 1
+            if (currentDisplayValue >= newTotalCountToStore) {
+                setAnimatedCount(newTotalCountToStore); // Ensure it ends exactly on the target
+            } else {
+                setAnimatedCount(currentDisplayValue);
+                setTimeout(animate, intervalTime); // Continue with the next increment
+            }
+        };
+        // Start the animation after a brief delay to show the starting number
+        const timeoutId = setTimeout(animate, intervalTime); 
+        return () => clearTimeout(timeoutId); // Cleanup timeout on component unmount
     } else {
-      // If no animation is needed
-      setAnimatedCount(newTotalCountToStore);
+        // If no animation is needed (e.g., count didn't actually increase), set directly.
+        setAnimatedCount(newTotalCountToStore);
     }
 
-  }, []); // Empty dependency array ensures this runs once on mount client-side
+  }, []); // Empty dependency array ensures this runs once on mount (per page load/refresh) client-side
 
   return (
     <div className="container mx-auto max-w-5xl px-4 py-12 md:py-20">
